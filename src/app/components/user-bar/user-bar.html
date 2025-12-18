@@ -1,0 +1,38 @@
+<div class="user-bar">
+  <div class="user-bar-left">
+    <button class="btn-home" (click)="goToHome()">Início</button>
+  </div>
+
+  <!-- Sempre mostra o bloco abaixo para manter o DOM estável -->
+  <ng-container>
+    <ng-container *ngIf="isLoggedIn; else loginTpl">
+      <div
+        class="user-name-clickable"
+        (click)="toggleSidebar(); $event.stopPropagation()"
+        title="Menu do usuário"
+      >
+        <span>👤 Olá, {{ userName }}</span>
+        <span style="font-size: 1.2rem;"> ☰ </span> <!-- Ícone clicável -->
+      </div>
+    </ng-container>
+
+    <ng-template #loginTpl>
+      <button class="btn-login" (click)="login()">Login</button>
+    </ng-template>
+  </ng-container>
+</div>
+
+<!-- Sidebar: só renderiza se o usuário estiver logado -->
+<div
+  class="sidebar"
+  [class.open]="isSidebarOpen"
+  #sidebar
+  *ngIf="isLoggedIn"
+>
+  <button class="close-btn" (click)="toggleSidebar()">✖</button>
+  <ul>
+    <li (click)="navigateTo('regulamento')">Regulamento do jogo</li>
+    <li *ngIf="isAdmin" (click)="navigateTo('influencer-panel')">Influenciadores</li>
+    <li (click)="logout()">Sair</li>
+  </ul>
+</div>

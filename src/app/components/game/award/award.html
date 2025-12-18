@@ -1,0 +1,97 @@
+
+
+<div class="wrapper">
+  <header class="falcon-header">
+    <img src="assets/images/logo-falcontouch-no-background.png" alt="FalconTouch Logo" class="falcon-logo" />
+    <!-- <h1>FalconTouch!</h1> -->
+    <p class="subtitle">Seja o primeiro a tocar e ganhe o prêmio!</p>
+  </header>
+
+  <main class="main-layout">
+  <app-notification
+    [show]="showNotificationDialog"
+    [message]="notificationMessage"
+    [type]="notificationType"
+    (dismiss)="showNotificationDialog = false">
+  </app-notification>
+  <app-confirm-dialog 
+    *ngIf="showConfirmDialog" 
+    [message]="confirmMessage" 
+    (confirmed)="confirmCallback && confirmCallback($event)">
+  </app-confirm-dialog>
+
+  <section class="product-section">
+      <div class="carousel-container" (touchstart)="onTouchStart($event)" (touchend)="onTouchEnd($event)">
+        <div class="carousel-images fade">
+        <img
+          *ngIf="product.imagens.length > 0 && product.imagens[currentImageIndex]"
+          [src]="product.imagens[currentImageIndex].imagem"
+          alt="{{ product.name }}"
+          class="premio-img"
+        />
+        </div>
+
+        <div class="arrow-controls">
+          <button class="arrow" (click)="prevImage()">&#10094;</button>
+
+          <button 
+            *ngIf="isAdmin && product.imagens.length > 0" 
+            class="delete-btn" 
+            (click)="deleteImage(currentImageIndex)"
+            title="Excluir imagem">
+            🗑️
+          </button>
+
+          <button class="arrow" (click)="nextImage()">&#10095;</button>
+        </div>
+
+
+        <div class="dots">
+          <span
+            *ngFor="let img of product.imagens; let i = index"
+            class="dot"
+            [class.active]="i === currentImageIndex"
+            (click)="goToImage(i)"
+          ></span>
+        </div>
+      </div>
+
+      <h3 class="product-name">{{ product.name }}</h3>
+    </section>
+
+    <!-- Seção Participar -->
+    <section *ngIf="!participando" class="participar-section" >
+      <h2>🔔 Deseja Participar?</h2>
+      <p>Clique no botão abaixo para entrar na tela de participação e garantir sua chance!</p>
+      <button class="btn btn-participar" (click)="goToParticipar()">Participar</button>
+    </section>
+
+    <section *ngIf="isLoggedIn" class="participation-status" [ngClass]="{ 'participando': participando, 'nao-participando': !participando }">
+      <p *ngIf="isAdmin">👤🔧 Administrador</p>
+      <p *ngIf="participando && !isAdmin">✅ Você está participando deste jogo!</p>
+      <p *ngIf="!participando && !isAdmin">❌ Você ainda não está participando. Clique em "Participar".</p>
+    </section>
+
+    <section class="game-container">
+      <div *ngIf="isLoggedIn; else pleaseLogin">
+        <p *ngIf="currentGameId; else noGame">
+          <strong>FalconTouch!</strong> <br />
+          O jogo ainda não começou. Clique em "Iniciar Jogo" para participar!
+        </p>
+
+        <ng-template #noGame>
+          <p>Nenhum jogo iniciado no momento.</p>
+        </ng-template>
+
+        <button class="btn btn-start" (click)="startGame()">Iniciar Jogo</button>
+      </div>
+
+      <ng-template #pleaseLogin>
+        <p>Você precisa estar logado para participar do jogo.</p>
+        <button (click)="login()" class="btn btn-login">Login</button>
+      </ng-template>
+    </section>
+
+  </main>
+
+</div>

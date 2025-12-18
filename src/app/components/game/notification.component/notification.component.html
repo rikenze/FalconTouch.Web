@@ -1,0 +1,9 @@
+<div *ngIf="show" class="modal-backdrop" (click)="close()">
+  <div class="modal-content" [ngClass]="type" (click)="$event.stopPropagation()">
+    <div class="icon">
+      {{ type === 'success' ? '✅' : type === 'error' ? '❌' : '⚠️' }}
+    </div>
+    <div class="message">{{ message }}</div>
+    <button class="close-btn" (click)="close()">×</button>
+  </div>
+</div>

@@ -1,0 +1,287 @@
+.admin-panel {
+  max-width: 1000px;
+  margin: 1rem auto;
+  padding: 2rem;
+  border-radius: 16px;
+  background: linear-gradient(to bottom right, #e0e7ff, #cfd8ff);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
+  font-family: 'Segoe UI', Roboto, sans-serif;
+  overflow-x: auto;
+}
+
+h2 {
+  text-align: center;
+  font-size: 1.8rem;
+  color: #333;
+  margin-bottom: 1rem;
+}
+
+p {
+  color: #555;
+  font-size: 0.95rem;
+  margin: 1rem 0;
+}
+
+.form-block {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  max-width: 500px;
+  margin-bottom: 2rem;
+}
+
+label {
+  font-weight: 600;
+  font-size: 0.95rem;
+  color: #444;
+}
+
+input, select {
+  padding: 0.6rem 0.8rem;
+  font-size: 1rem;
+  border: 1px solid;
+  border-radius: 8px;
+  background-color: #f0f4ff;
+  transition: border-color 0.2s;
+}
+
+input:focus, select:focus {
+  outline: none;
+}
+
+/* Tabela responsiva */
+.influencer-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 1.5rem;
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 8px 24px rgba(0,0,0,0.08);
+  font-family: 'Segoe UI', Roboto, sans-serif;
+  table-layout: fixed;
+  overflow-x: auto;
+}
+
+.influencer-table th,
+.influencer-table td {
+  padding: 0.75rem;
+  text-align: left;
+  font-size: 0.95rem;
+  overflow-wrap: break-word;
+  word-break: break-word;
+  white-space: normal;
+}
+
+/* Colunas com larguras balanceadas */
+.influencer-table th:nth-child(1),
+.influencer-table td:nth-child(1) {
+  min-width: 120px; /* Nome */
+}
+
+.influencer-table th:nth-child(2),
+.influencer-table td:nth-child(2) {
+  min-width: 90px; /* Código */
+}
+
+.influencer-table th:nth-child(3),
+.influencer-table td:nth-child(3) {
+  min-width: 120px; /* Desconto */
+}
+
+.influencer-table th:nth-child(4),
+.influencer-table td:nth-child(4) {
+  min-width: 100px; /* Tipo */
+}
+
+.influencer-table th:nth-child(5),
+.influencer-table td:nth-child(5) {
+  min-width: 80px; /* Valor */
+}
+
+.influencer-table th:nth-child(6),
+.influencer-table td:nth-child(6) {
+  min-width: 100px; /* Seguidores */
+}
+
+.influencer-table th:nth-child(7),
+.influencer-table td:nth-child(7) {
+  min-width: 80px; /* Ativo */
+}
+
+.influencer-table th:nth-child(8),
+.influencer-table td:nth-child(8) {
+  min-width: 110px; /* Conversões */
+}
+
+.influencer-table th:nth-child(9),
+.influencer-table td:nth-child(9) {
+  min-width: 160px; /* Ações */
+}
+
+/* Ações na última coluna com botões lado a lado */
+.influencer-table td:last-child {
+  display: flex;
+  gap: 0.5rem;
+  justify-content: flex-start;
+}
+
+.influencer-table button.edit {
+  color: #000;
+  padding: 0.4rem 0.8rem;
+  border-radius: 6px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.influencer-table button.delete {
+  color: #fff;
+  padding: 0.4rem 0.8rem;
+  border-radius: 6px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.influencer-table button.edit:hover {
+  background-color: #e0a800;
+}
+
+.influencer-table button.delete:hover {
+  background-color: #b02a37;
+}
+
+.error {
+  color: red;
+  font-size: 0.85rem;
+  margin-top: 0.2rem;
+  display: block;
+}
+
+.influencer-table {
+    display: block;
+    overflow-x: auto;
+}
+
+.influencer-table th, .influencer-table td {
+    font-size: 0.85rem;
+    padding: 0.5rem;
+}
+
+.influencer-table td:last-child {
+    flex-direction: column;
+    gap: 0.3rem;
+}
+
+.influencer-table tbody tr {
+  border-bottom: 1px solid #ccc;
+}
+
+/* Botões base */
+button,
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.4rem;
+  padding: 0.65rem 1.3rem;
+  font-size: 0.95rem;
+  font-weight: 600;
+  border: none;
+  border-radius: 12px;
+  cursor: pointer;
+  transition: all 0.2s ease-in-out;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+}
+
+/* Cores principais */
+.btn-primary {
+  background: linear-gradient(to right, #007bff, #0056b3);
+  color: #fff;
+}
+
+.btn-primary:hover {
+  background: linear-gradient(to right, #0069d9, #004a99);
+  transform: translateY(-2px);
+}
+
+.btn-secondary {
+  background: linear-gradient(to right, #6c757d, #5a6268);
+  color: #fff;
+}
+
+.btn-secondary:hover {
+  background: linear-gradient(to right, #545b62, #3f454b);
+  transform: translateY(-2px);
+}
+
+/* Botões de ação na tabela */
+.btn-edit {
+  background: linear-gradient(to right, #ffc107, #e0a800);
+  color: #000;
+  padding: 0.4rem 0.9rem;
+  font-size: 0.9rem;
+  border-radius: 10px;
+}
+
+.btn-edit:hover {
+  background: linear-gradient(to right, #ffca2c, #d39e00);
+  transform: scale(1.05);
+}
+
+.btn-delete {
+  background: linear-gradient(to right, #dc3545, #a71d2a);
+  color: #fff;
+  padding: 0.4rem 0.9rem;
+  font-size: 0.9rem;
+  border-radius: 10px;
+}
+
+.btn-delete:hover {
+  background: linear-gradient(to right, #e55365, #8b1521);
+  transform: scale(1.05);
+}
+
+button:disabled {
+  background: #ccc;
+  cursor: not-allowed;
+  opacity: 0.7;
+}
+
+/* Alinhamento vertical em botões pequenos */
+.influencer-table td:last-child {
+  flex-direction: row;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+
+/* Responsivo */
+@media (max-width: 768px) {
+  .form-block {
+    width: 100%;
+  }
+
+  .influencer-table {
+    display: block;
+    overflow-x: auto;
+  }
+
+  .influencer-table th, .influencer-table td {
+    font-size: 0.85rem;
+    padding: 0.5rem;
+  }
+
+  .influencer-table td:last-child {
+    flex-direction: column;
+    gap: 0.3rem;
+  }
+
+  .influencer-table tbody tr {
+    border-bottom: 1px solid #ccc;
+  }
+
+}

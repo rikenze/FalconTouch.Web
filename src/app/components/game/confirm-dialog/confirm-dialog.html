@@ -1,0 +1,11 @@
+<div class="modal-backdrop" (click)="onCancel()">
+  <div class="modal-content warning" (click)="$event.stopPropagation()">
+    <div class="icon">⚠️</div>
+    <div class="message">{{ message }}</div>
+    <div class="buttons">
+      <button (click)="onConfirm()" class="confirm-btn">Confirmar</button>
+      <button (click)="onCancel()" class="cancel-btn">Cancelar</button>
+    </div>
+    <button class="close-btn" (click)="onCancel()">×</button>
+  </div>
+</div>

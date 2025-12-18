@@ -1,0 +1,6 @@
+app-user-bar,
+router-outlet,
+app-footer {
+  display: block;
+  width: 100%;
+}

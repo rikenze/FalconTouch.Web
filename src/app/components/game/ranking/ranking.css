@@ -1,0 +1,106 @@
+.modal-backdrop {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100dvh;
+  background-color: rgba(0, 0, 0, 0.7);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 9999;
+  animation: fadeIn 0.3s ease;
+}
+
+.modal-content {
+  background-color: #1d3557;
+  color: white;
+  border-radius: 16px;
+  padding: 2rem;
+  width: 90%;
+  max-width: 500px;
+  box-shadow: 0 0 20px rgba(0, 0, 0, 0.6);
+  position: relative;
+  animation: slideUp 0.4s ease;
+}
+
+.close-button {
+  position: absolute;
+  top: 1rem;
+  right: 1rem;
+  background: transparent;
+  border: none;
+  font-size: 1.8rem;
+  color: white;
+  cursor: pointer;
+}
+
+.ranking-title {
+  font-size: 1.5rem;
+  margin-bottom: 1rem;
+  text-align: center;
+  color: #ffd700;
+}
+
+.ranking-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.ranking-list li {
+  display: flex;
+  justify-content: space-between;
+  padding: 0.6rem 1rem;
+  border-bottom: 1px solid #444;
+  font-size: 1rem;
+  align-items: center;
+}
+
+.ranking-list li.gold {
+  background: linear-gradient(to right, #ffd700, #ffeb3b20);
+  color: #000;
+  font-weight: bold;
+}
+
+.ranking-list li.silver {
+  background: linear-gradient(to right, #c0c0c0, #c0c0c020);
+  color: #000;
+}
+
+.ranking-list li.bronze {
+  background: linear-gradient(to right, #cd7f32, #cd7f3220);
+  color: #000;
+}
+
+.position {
+  width: 40px;
+  font-weight: bold;
+}
+
+.player-email {
+  flex: 1;
+  text-align: left;
+  padding-left: 0.5rem;
+}
+
+.reaction-time {
+  font-family: monospace;
+  color: #00ffcc;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateY(50px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}

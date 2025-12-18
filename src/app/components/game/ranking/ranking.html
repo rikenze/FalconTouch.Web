@@ -1,0 +1,14 @@
+<div class="modal-backdrop" *ngIf="visible">
+  <div class="modal-content" #rankingRef>
+    <button class="close-button" (click)="onClose()">×</button>
+    <h2 class="ranking-title">🏆 Top jogadores mais rápidos</h2>
+    <ul class="ranking-list">
+      <li *ngFor="let jogador of data; let i = index" [ngClass]="{ 'gold': i === 0}">
+      <!-- <li *ngFor="let jogador of data; let i = index" [ngClass]="{ 'gold': i === 0, 'silver': i === 1, 'bronze': i === 2 }"></li> -->
+        <span class="position">#{{ i + 1 }}</span>
+        <span class="player-email">{{ jogador.email }}</span>
+        <span class="reaction-time">{{ jogador.time }} ms</span>
+      </li>
+    </ul>
+  </div>
+</div>

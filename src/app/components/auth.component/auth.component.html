@@ -1,0 +1,58 @@
+  <app-notification
+    [show]="showNotificationDialog"
+    [message]="notificationMessage"
+    [type]="notificationType"
+    (dismiss)="showNotificationDialog = false">
+  </app-notification>
+  <app-confirm-dialog 
+    *ngIf="showConfirmDialog" 
+    [message]="confirmMessage" 
+    (confirmed)="confirmCallback && confirmCallback($event)">
+  </app-confirm-dialog>
+<div class="auth-container">
+  <h2>{{ isLogin ? 'Login' : 'Registrar' }}</h2>
+  <form [formGroup]="authForm" (ngSubmit)="onSubmit()">
+    <input formControlName="name" type="text" placeholder="Nome" *ngIf="!isLogin" />
+    <small class="error" *ngIf="authForm.get('name')?.invalid && authForm.get('name')?.touched">
+        Nome é obrigatório.
+    </small>
+    <input formControlName="email" type="email" placeholder="Email" />
+    <small class="error" *ngIf="authForm.get('email')?.invalid && authForm.get('email')?.touched">
+        Email é obrigatório.
+    </small>
+    <div class="password-wrapper">
+      <input
+        formControlName="password"
+        [type]="showPassword ? 'text' : 'password'"
+        placeholder="Senha" />
+        <button type="button" class="eye-btn" (click)="showPassword = !showPassword">
+          {{ showPassword ? '🙈' : '👁️' }}
+        </button>
+      </div>
+      <small class="error" *ngIf="authForm.get('password')?.invalid && authForm.get('password')?.touched">
+          Senha é obrigatória.
+      </small>
+    <div *ngIf="!isLogin">
+      <label for="cpf" class="cpf-info">CPF é necessário para garantir a autenticidade do jogador.</label>
+      <input formControlName="cpf" placeholder="000.000.000-00" mask="000.000.000-00" [dropSpecialCharacters]="false"/>
+      <small class="error" *ngIf="authForm.get('cpf')?.invalid && authForm.get('cpf')?.touched">
+        CPF é obrigatório.
+      </small>
+    </div>
+
+    <div *ngIf="!isLogin" class="politica-box">
+      <input type="checkbox" class="checkbox" formControlName="aceitaPolitica" />
+      <label class="politica-label">
+        Li e concordo com a
+        <a *ngIf="!isLogin" href="/politica-de-privacidade" target="_blank" (click)="$event.stopPropagation()" class="politica-link"> Política de Privacidade</a>
+      </label>
+    </div>
+
+    <button class="btn" type="submit">{{ isLogin ? 'Entrar' : 'Registrar' }}</button>
+  </form>
+  <strong><p class="toggle" (click)="toggleMode()">
+    {{ isLogin ? 'Não tem conta? Registre-se' : 'Já tem conta? Login' }}
+  </p></strong>
+  <p *ngIf="isLogin" class="forgot-password" (click)="openPasswordReset()">Esqueceu a senha?</p>
+
+</div>

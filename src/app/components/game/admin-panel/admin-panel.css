@@ -1,0 +1,141 @@
+.admin-panel {
+  max-width: 600px;
+  margin: 0.5rem;
+  padding: 60px 5vw;
+  border-radius: 16px;
+  background: linear-gradient(to bottom right, #e0e7ff, #cfd8ff);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
+  font-family: 'Segoe UI', Roboto, sans-serif;
+}
+
+h2 {
+  text-align: center;
+  font-size: 1.8rem;
+  color: #333;
+}
+
+p {
+  margin: 2% 0% 2% 0%;
+  color: #555;
+  font-size: 0.95rem;
+}
+
+.form-block {
+  display: flex;
+  flex-direction: column;
+  /* gap: 0.5rem; */
+  margin-bottom: 0.6rem;
+}
+
+label {
+  font-weight: 600;
+  font-size: 0.95rem;
+  color: #444;
+}
+
+input {
+  padding: 0.6rem 0.8rem;
+  font-size: 1rem;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  background-color: #f0f4ff;
+  border: 1px solid #c0c8e0;
+  transition: border-color 0.2s;
+}
+
+input:focus {
+  border-color: #007bff;
+  outline: none;
+}
+
+button {
+  padding: 0.7rem;
+  font-size: 1rem;
+  border: none;
+  border-radius: 8px;
+  background-color: #007bff;
+  color: #fff;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.2s, transform 0.1s;
+}
+
+button:hover {
+  background-color: #005fcc;
+  transform: translateY(-1px);
+}
+
+button:disabled {
+  background-color: #bbb;
+  cursor: not-allowed;
+}
+
+/* Verde se ativo */
+.toggle-btn.ativo {
+  background-color: #28a745; /* Bootstrap green */
+}
+
+/* Vermelho se inativo */
+.toggle-btn.inativo {
+  background-color: #ff4d4d; /* Bootstrap red */
+}
+
+.toggle-btn {
+  background-color: #28a745;
+}
+
+.toggle-btn:hover {
+  background-color: #218838;
+}
+
+.error {
+  color: #dc3545;
+  font-size: 0.85rem;
+}
+
+.success {
+  color: #198754;
+  text-align: center;
+  font-weight: 600;
+  margin-top: 1rem;
+}
+
+.error.message {
+  color: #dc3545;
+  text-align: center;
+  font-weight: 600;
+  margin-top: 1rem;
+}
+
+.upload-container {
+  margin-top: 1rem;
+  border: 2px dashed #a0a8ff;
+  padding: 1rem;
+  border-radius: 12px;
+  background-color: #f5f8ff;
+  transition: background-color 0.3s ease;
+}
+
+.upload-container:hover {
+  background-color: #e8edff;
+}
+
+.upload-container input[type="file"] {
+  background-color: white;
+  padding: 0.4rem;
+  border-radius: 6px;
+  border: 1px solid #ccc;
+  font-size: 0.9rem;
+}
+
+
+/* Responsivo */
+@media (max-width: 600px) {
+  .admin-panel {
+    padding: 60px 5vw;
+  }
+
+  h2 {
+    font-size: 1.5rem;
+  }
+}

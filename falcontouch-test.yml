@@ -1,0 +1,19 @@
+config:
+  target: "http://localhost:3001"
+  phases:
+    - duration: 60
+      arrivalRate: 300
+  socketio:
+    transport: "websocket"
+
+scenarios:
+  - name: Jogadores clicando no botão prêmio
+    engine: socketio
+    flow:
+      - think: 1
+      - emit:
+          channel: "click"
+          data:
+            buttonIndex: 0
+          response: # espera um ack do servidor, evita o erro "Callback was already called"
+            channel: "click-ack"  # ou o nome do ack que seu servidor envia

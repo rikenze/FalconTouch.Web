@@ -1,0 +1,553 @@
+/* Reset básico */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html, body {
+  height: 100%;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  background: rgba(255, 255, 255, 0.05);
+}
+
+/* Top Bar */
+.top-bar {
+  width: 100%;
+  padding: 10px 5vw;
+  background: #1d3557;
+  color: white;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+/* User info no header */
+.user-info {
+  margin-top: 10px;
+  display: flex;
+  justify-content: center; /* centraliza no header */
+  align-items: center;
+  gap: 15px;
+  font-weight: 600;
+  color: #ddd;
+}
+
+.guest-info {
+  margin-top: 10px;
+  color: #bbb;
+  font-style: italic;
+  display: flex;
+  justify-content: center;
+  gap: 12px;
+  align-items: center;
+}
+
+/* Botões login/logout */
+.btn-login,
+.btn-logout {
+  background: #457b9d;
+  color: white;
+  border: none;
+  padding: 6px 12px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: 600;
+  box-shadow: 0 4px 8px rgba(69, 123, 157, 0.6);
+  transition: background-color 0.3s ease;
+}
+
+.btn-login:hover,
+.btn-logout:hover {
+  background: #2c4f6b;
+}
+
+/* Progress bar */
+.progress-bar {
+  background: #e0e0e0;
+  height: 20px;
+  border-radius: 10px;
+  overflow: hidden;
+  font-size: 0.9rem;
+  color: #000;
+}
+
+.progress {
+  background: #1abc9c;
+  height: 100%;
+  transition: width 0.3s ease-in-out;
+}
+
+/* Layout principal */
+.main-layout {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 5px;
+  width: 100%;
+}
+
+/* Wrapper geral */
+.wrapper {
+  background: rgba(255, 255, 255, 0.05);
+  width: 100%;
+  min-height: 100vh;
+  margin: 0 auto;
+  border-radius: 15px;
+  padding: 20px 5vw 30px;
+  box-shadow: 0 0 20px rgba(0,0,0,0.5);
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  color: white;
+  text-align: center;
+
+  max-width: 100%; /* padrão mobile */
+}
+
+/* Header */
+header h1 {
+  font-size: 2.2rem;
+  font-weight: 700;
+  letter-spacing: 1px;
+  /* margin-bottom: 8px; */
+  text-shadow: 1px 1px 8px rgba(0,0,0,0.3);
+}
+
+.subtitle {
+  font-size: 1.1rem;
+  color: #dcdcdccc;
+}
+
+/* Game Container */
+.game-container {
+  background: rgba(0, 0, 0, 0.15);
+  padding: 20px;
+  border-radius: 12px;
+  color: white;
+  text-align: center;
+}
+
+section {
+  width: 100%;
+  max-width: 480px;
+  margin: 20px 0;
+}
+
+/* Participar */
+.participar-section {
+  margin-top: 10px;
+  padding: 20px;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 10px;
+  text-align: center;
+  color: white;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+}
+
+.btn-participar {
+  background-color: #00c853;
+  color: white;
+  font-weight: bold;
+  margin-top: 15px;
+  padding: 12px 28px;
+  border-radius: 30px;
+  font-size: 1rem;
+}
+
+.btn-participar:hover {
+  background-color: #009624;
+}
+
+/* Prêmio */
+.product-display {
+  background: rgba(255, 255, 255, 0.1);
+  padding: 20px;
+  border-radius: 12px;
+  width: 100%;
+  color: f0f0f0;
+  text-align: center;
+  box-shadow: 0 0 10px rgba(0,0,0,0.2);
+}
+
+.product-display img {
+  width: 100%;
+  max-height: 260px;
+  object-fit: contain;
+  border-radius: 8px;
+  margin-bottom: 10px;
+}
+
+/* Mensagens e títulos */
+.prompt {
+  font-size: 1.3rem;
+  font-weight: 600;
+  margin-bottom: 20px;
+  color: #f0f0f0;
+}
+
+.timer {
+  font-size: 1.1rem;
+  font-weight: bold;
+  margin-bottom: 20px;
+  color: white;
+}
+
+.waiting p {
+  font-size: 1.2rem;
+  margin-bottom: 20px;
+  color: #eee;
+}
+
+/* Vencedor */
+.winner-announcement h2 {
+  font-size: 1.8rem;
+  font-weight: 800;
+  color: #ffd700;
+  margin-bottom: 12px;
+  text-shadow: 2px 2px 12px #ffa500cc;
+}
+
+.winner-name {
+  text-transform: uppercase;
+  letter-spacing: 1.5px;
+}
+
+/* Botões comuns */
+.btn {
+  padding: 14px 40px;
+  font-size: 1.2rem;
+  font-weight: 700;
+  border: none;
+  border-radius: 50px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 6px 12px rgba(0,0,0,0.3);
+  user-select: none;
+  outline-offset: 2px;
+}
+
+.btn:focus-visible {
+  outline: 3px solid #ffdd57;
+}
+
+/* Botões específicos */
+.btn-start {
+  margin-top: 20px;
+  background: #2575fc;
+  color: white;
+  box-shadow: 0 6px 18px #2575fcbb;
+}
+
+.btn-start:hover {
+  background: #1861d6;
+}
+
+.btn-click {
+  background: #ffd700;
+  color: #000;
+  box-shadow: 0 6px 18px #d4af37cc;
+}
+
+.btn-click:hover {
+  background: #e6c200;
+}
+
+.btn-reset {
+  background: #ff5252;
+  color: white;
+  box-shadow: 0 6px 18px #ff5250bb;
+  margin-top: 25px;
+}
+
+.btn-reset:hover {
+  background: #e04343;
+  box-shadow: 0 8px 25px #e0434300;
+}
+
+/* Rodapé */
+footer p {
+  margin-top: 25px;
+  font-size: 0.9rem;
+  color: #ccc;
+  font-style: italic;
+}
+
+.btn-start {
+  background: linear-gradient(135deg, #7b2ff7 0%, #f107a3 100%);
+  color: #fff;
+  font-weight: 700;
+  font-size: 1.25rem;
+  padding: 0.85rem 2.5rem;
+  border: none;
+  border-radius: 35px;
+  box-shadow:
+    0 8px 24px rgba(123, 47, 247, 0.6),
+    0 0 12px rgba(241, 7, 163, 0.8);
+  cursor: pointer;
+  transition:
+    background 0.4s ease,
+    box-shadow 0.4s ease,
+    transform 0.25s ease;
+  user-select: none;
+  text-align: center;
+  letter-spacing: 0.04em;
+  text-shadow: 0 0 8px rgba(255,255,255,0.3);
+}
+
+.btn-start:hover {
+  background: linear-gradient(135deg, #8f3eff 0%, #f92ebd 100%);
+  box-shadow:
+    0 12px 36px rgba(143, 62, 255, 0.9),
+    0 0 18px rgba(249, 46, 189, 1);
+  transform: scale(1.05);
+}
+
+.btn-start:active {
+  transform: scale(0.98);
+  box-shadow:
+    0 6px 18px rgba(143, 62, 255, 0.7),
+    0 0 10px rgba(249, 46, 189, 0.8);
+}
+
+.btn-start:focus {
+  outline: none;
+  box-shadow:
+    0 0 0 4px rgba(143, 62, 255, 0.7),
+    0 0 12px rgba(249, 46, 189, 0.8);
+}
+
+.participation-status {
+  margin-top: 20px;
+  padding: 15px;
+  border-radius: 10px;
+  text-align: center;
+  font-size: 1.1rem;
+  font-weight: 600;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+  max-width: 90%;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.participando {
+  background-color: #2e7d32;
+  color: #d0fdd0;
+  border: 1px solid #66bb6a;
+}
+
+.nao-participando {
+  background-color: #ff4d4d;
+  color: #ffdada;
+  border: 1px solid #ef5350;
+}
+
+
+/* 🔁 Media Queries */
+@media (max-width: 480px) {
+  header h1 {
+    font-size: 1.8rem;
+  }
+
+  .btn {
+    font-size: 1rem;
+    padding: 12px 28px;
+  }
+
+  .subtitle {
+    font-size: 1rem;
+  }
+
+  .prompt {
+    font-size: 1.1rem;
+  }
+
+  .timer {
+    font-size: 1rem;
+  }
+
+  .product-display img {
+    max-height: 180px;
+  }
+
+  .winner-announcement h2 {
+    font-size: 1.5rem;
+  }
+
+  section {
+    margin-bottom: 20px;
+  }
+}
+
+.carousel-container {
+  max-width: 320px;
+  margin: auto;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.carousel-images {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  transition: opacity 0.5s ease-in-out;
+}
+
+.premio-img {
+  max-width: 100%;
+  max-height: 300px;
+  object-fit: contain;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.arrow-controls {
+  margin-top: 1rem;
+  display: flex;
+  gap: 1rem;
+  justify-content: center;
+}
+
+.arrow {
+  font-size: 1.5rem;
+  background: #333;
+  color: white;
+  border: none;
+  border-radius: 50%;
+  width: 36px;
+  height: 36px;
+  cursor: pointer;
+  transition: background 0.3s ease;
+}
+
+.arrow:hover {
+  background: #555;
+}
+
+.dots {
+  margin-top: 0.5rem;
+  display: flex;
+  justify-content: center;
+  gap: 0.4rem;
+}
+
+.dot {
+  height: 10px;
+  width: 10px;
+  background-color: #bbb;
+  border-radius: 50%;
+  display: inline-block;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.dot.active {
+  background-color: #333;
+}
+
+.product-name {
+  margin-top: 1rem;
+  text-align: center;
+}
+
+.delete-btn {
+  background-color: #b71c1c;
+  color: white;
+  border: none;
+  border-radius: 50%;
+  font-size: 1.3rem;
+  width: 36px;
+  height: 36px;
+  cursor: pointer;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+  transition: background 0.3s ease;
+}
+
+.delete-btn:hover {
+  background-color: #d32f2f;
+}
+
+.falcon-header {
+  width: 100%;
+  max-width: 600px;
+  margin: 0 auto;
+  padding: 0 10px;
+}
+
+.falcon-logo {
+  width: 100%;
+  height: auto;
+  display: block;
+  object-fit: contain;
+  filter: drop-shadow(0 0 2px #00e5ff)
+          drop-shadow(0 0 6px #00cfff)
+          drop-shadow(0 0 10px #1e1e2f);
+  animation: pulseGlow 2s infinite ease-in-out;
+  transition: transform 0.3s ease;
+}
+
+.falcon-logo:hover {
+  transform: scale(1.05);
+}
+
+@keyframes pulseGlow {
+  0% {
+    filter: drop-shadow(0 0 2px #00e5ff)
+            drop-shadow(0 0 6px #00cfff)
+            drop-shadow(0 0 10px #1e1e2f);
+    transform: scale(1);
+  }
+  50% {
+    filter: drop-shadow(0 0 4px #00e5ff)
+            drop-shadow(0 0 12px #00cfff)
+            drop-shadow(0 0 20px #1e1e2f);
+    transform: scale(1.03);
+  }
+  100% {
+    filter: drop-shadow(0 0 2px #00e5ff)
+            drop-shadow(0 0 6px #00cfff)
+            drop-shadow(0 0 10px #1e1e2f);
+    transform: scale(1);
+  }
+}
+
+
+@media (min-width: 768px) {
+  .wrapper {
+    max-width: 720px;
+  }
+}
+
+@media (min-width: 1024px) {
+  .wrapper {
+    max-width: 960px;
+  }
+}
+
+@media only screen and (max-width: 480px) {
+
+  /* Wrapper geral */
+  .wrapper {
+    background: rgba(255, 255, 255, 0.05);
+    width: 100%;
+    min-height: 100vh;
+    margin: 0 auto;
+    border-radius: 15px;
+    padding: 20px 5vw;
+    box-shadow: 0 0 20px rgba(0,0,0,0.5);
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    color: white;
+    text-align: center;
+
+    max-width: 100%; /* padrão mobile */
+  }
+
+  .main-layout {
+    padding: 0;
+  }
+}
+

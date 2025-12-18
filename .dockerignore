@@ -1,0 +1,30 @@
+# Ignorar módulos instalados (serão instalados dentro do container)
+node_modules/
+frontend/node_modules/
+
+# Ignorar builds
+dist/
+frontend/dist/
+
+# Ignorar arquivos temporários e de sistema
+*.log
+*.tmp
+*.swp
+*.DS_Store
+*.env
+*.env.*  # Ignora todos os .env (use env_file no docker-compose)
+
+# Ignorar pastas do editor
+.vscode/
+.idea/
+
+# Ignorar arquivos git
+.git
+.gitignore
+
+# Ignorar certificados locais (mas montar via volume no compose)
+certs/
+
+# Outras pastas que não precisam ir para o container
+coverage/
+test-results/
