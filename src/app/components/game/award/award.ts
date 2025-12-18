@@ -7,8 +7,8 @@ import { Subject, takeUntil } from 'rxjs';
 
 import { AuthService } from '../auth.service';
 import { NotificationComponent } from '../notification.component/notification.component';
-import { SignalRService } from '../signalr.service';
 import { ConfirmDialog } from '../confirm-dialog/confirm-dialog';
+import { SignalRService } from '../signalr.service';
 
 @Component({
   selector: 'app-award',
@@ -18,14 +18,11 @@ import { ConfirmDialog } from '../confirm-dialog/confirm-dialog';
   styleUrls: ['./award.css']
 })
 export class Award implements OnInit, OnDestroy {
-
   private destroy$ = new Subject<void>();
 
   playerEmail = '';
   isLoggedIn = false;
-  currentGameId: string | null = null;
-  totalPlayers = 0;
-  playersPaidCount = 0;
+  currentGameId: number | null = null;
 
   showNotificationDialog = false;
   notificationMessage = '';
@@ -43,9 +40,9 @@ export class Award implements OnInit, OnDestroy {
   confirmCallback?: (confirmed: boolean) => void;
 
   product = {
-    name: 'iPhone 13 Pro max',
-    imagens: [] as { id: string; imagem: string }[],
-    description: 'O mais novo iPhone com câmera poderosa e chip A17 Bionic.'
+    name: 'IPhone 13 Pro max',
+    imagens: [] as { id: number; imagem: string }[],
+    description: 'Descricao do premio.'
   };
 
   constructor(
@@ -59,32 +56,45 @@ export class Award implements OnInit, OnDestroy {
     this.isLoggedIn = this.authService.isLoggedIn();
     this.playerEmail = this.authService.getUserEmail() || '';
 
-    // 🔌 SignalR
     await this.signalR.connect();
 
-    this.signalR.premio$
+    this.signalR.prizeDescription$
       .pipe(takeUntil(this.destroy$))
-      .subscribe(data => {
-        if (data?.descricao) {
-          this.product.name = data.descricao;
+      .subscribe((description) => {
+        if (description) this.product.name = description;
+      });
+
+    this.signalR.prizeImages$
+      .pipe(takeUntil(this.destroy$))
+      .subscribe((images) => {
+        this.product.imagens = images.map(img => ({
+          id: img.id,
+          imagem: img.image
+        }));
+        if (this.currentImageIndex >= this.product.imagens.length) {
+          this.currentImageIndex = Math.max(this.product.imagens.length - 1, 0);
         }
       });
 
-    this.signalR.premioImagens$
-      .pipe(takeUntil(this.destroy$))
-      .subscribe(data => {
-        if (Array.isArray(data?.imagens)) {
-          this.product.imagens = data.imagens;
-          if (this.currentImageIndex >= this.product.imagens.length) {
-            this.currentImageIndex = Math.max(this.product.imagens.length - 1, 0);
-          }
-        }
-      });
-
-    this.loadPublicGameData();
+    try {
+      const publicGame = await this.signalR.getPublicGame();
+      this.product.name = publicGame.prizeDescription;
+      this.product.imagens = publicGame.images.map(img => ({
+        id: img.id,
+        imagem: img.image
+      }));
+    } catch (err) {
+      console.error('Erro ao buscar dados publicos do jogo:', err);
+    }
 
     if (this.isLoggedIn) {
-      this.loadPrivateGameData();
+      try {
+        const current = await this.signalR.getCurrentGame();
+        this.currentGameId = current.id;
+      } catch {
+        this.currentGameId = null;
+      }
+
       this.checkPaymentStatus();
     }
 
@@ -93,37 +103,8 @@ export class Award implements OnInit, OnDestroy {
       .subscribe(status => this.isAdmin = status);
   }
 
-  loadPublicGameData() {
-    this.http.get<{ premio: string; imagens?: { id: string; imagem: string }[] }>(
-      '/api/game/public-current-game'
-    ).subscribe({
-      next: (res) => {
-        this.product.name = res.premio;
-        this.product.imagens = res.imagens ?? [];
-      },
-      error: (err) => console.error('Erro ao buscar dados públicos do jogo:', err)
-    });
-  }
-
-  loadPrivateGameData() {
-    this.http.get<{ id: string; totalPlayers: number; playersPaidCount: number }>(
-      '/api/game/current-game'
-    ).subscribe({
-      next: (res) => {
-        this.currentGameId = res.id;
-        this.totalPlayers = res.totalPlayers;
-        this.playersPaidCount = res.playersPaidCount;
-      },
-      error: () => {
-        this.currentGameId = null;
-        this.totalPlayers = 0;
-        this.playersPaidCount = 0;
-      }
-    });
-  }
-
   checkPaymentStatus() {
-    this.http.get<{ hasPaid: boolean }>('/api/game/check-payment').subscribe({
+    this.http.get<{ hasPaid: boolean }>('/api/payments/check-payment').subscribe({
       next: (res) => this.participando = res.hasPaid,
       error: () => this.showNotification('Erro ao verificar pagamento.', 'error')
     });
@@ -141,7 +122,7 @@ export class Award implements OnInit, OnDestroy {
 
   goToParticipar() {
     if (!this.isLoggedIn) {
-      this.showNotification('Você precisa estar logado para participar!', 'warning');
+      this.showNotification('Voce precisa estar logado para participar!', 'warning');
       this.router.navigate(['/auth']);
       return;
     }
@@ -150,29 +131,20 @@ export class Award implements OnInit, OnDestroy {
 
   startGame() {
     if (!this.isLoggedIn) {
-      this.showNotification('Você precisa estar logado para jogar!', 'warning');
+      this.showNotification('Voce precisa estar logado para jogar!', 'warning');
       this.router.navigate(['/auth']);
       return;
     }
 
-    this.http.get<{ hasPaid: boolean }>('/api/game/check-payment').subscribe({
+    this.http.get<{ hasPaid: boolean }>('/api/payments/check-payment').subscribe({
       next: (res) => {
         if (!res.hasPaid) {
-          this.showNotification('Você precisa realizar o pagamento para participar.', 'warning');
+          this.showNotification('Voce precisa realizar o pagamento para participar.', 'warning');
           this.router.navigate(['/participar']);
           return;
         }
 
-        this.http.get<{ gameStarted: boolean }>('/api/game/status').subscribe({
-          next: (res) => {
-            if (res.gameStarted && !this.isAdmin) {
-              this.showNotification('O jogo já foi iniciado.', 'warning');
-              return;
-            }
-            this.router.navigate(['/play']);
-          },
-          error: () => this.showNotification('Erro ao verificar estado do jogo.', 'error')
-        });
+        this.router.navigate(['/play']);
       },
       error: () => this.showNotification('Erro ao verificar pagamento.', 'error')
     });
@@ -206,15 +178,18 @@ export class Award implements OnInit, OnDestroy {
 
   async deleteImage(index: number) {
     const image = this.product.imagens[index];
-    if (!image?.id) return;
+    if (!image?.id || !this.currentGameId) return;
 
     const confirmed = await this.askConfirm('Tem certeza que deseja excluir esta imagem?');
     if (!confirmed) return;
 
-    this.http.delete(`/api/game/image/${image.id}?gameId=${this.currentGameId}`).subscribe({
-      next: () => this.showNotification('🗑️ Imagem excluída com sucesso.', 'success'),
-      error: () => this.showNotification('❌ Erro ao excluir imagem.', 'error')
-    });
+    try {
+      await this.signalR.deletePrizeImage(image.id, this.currentGameId);
+      this.showNotification('Imagem excluida com sucesso.', 'success');
+    } catch (err) {
+      console.error('Erro ao excluir imagem:', err);
+      this.showNotification('Erro ao excluir imagem.', 'error');
+    }
   }
 
   askConfirm(message: string): Promise<boolean> {
@@ -229,17 +204,15 @@ export class Award implements OnInit, OnDestroy {
   }
 
   onTouchStart(event: TouchEvent) {
-  this.touchStartX = event.changedTouches[0].screenX;
-}
+    this.touchStartX = event.changedTouches[0].screenX;
+  }
 
   onTouchEnd(event: TouchEvent) {
     this.touchEndX = event.changedTouches[0].screenX;
-    // this.handleSwipe();
   }
 
   ngOnDestroy(): void {
     this.destroy$.next();
     this.destroy$.complete();
-    this.signalR.disconnect();
   }
 }

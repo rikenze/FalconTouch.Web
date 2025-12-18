@@ -3,7 +3,7 @@ import { Component, OnDestroy, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Router } from '@angular/router';
-import { filter, firstValueFrom, Subject, takeUntil } from 'rxjs';
+import { firstValueFrom, Subject, takeUntil } from 'rxjs';
 import { NgxMaskDirective } from 'ngx-mask';
 import { loadStripe, Stripe } from '@stripe/stripe-js';
 import { environment } from '../../../../environments/environment';
@@ -27,12 +27,12 @@ interface PixResponse {
 })
 export class Participar implements OnInit, OnDestroy {
   product = {
-    name: 'iPhone 13 Pro max',
-    imagens: [] as { id: string; imagem: string }[],
-    description: 'O mais novo iPhone com câmera poderosa e chip A17 Bionic.'
+    name: 'IPhone 13 Pro max',
+    imagens: [] as { id: number; imagem: string }[],
+    description: 'Descricao do premio.'
   };
 
-  metodosPagamento: string[] = ['Pix', 'Cartão de Crédito'];
+  metodosPagamento: string[] = ['Pix', 'Cartao de Credito'];
   preco = 0.0;
 
   formDadosEntrega!: FormGroup;
@@ -83,19 +83,16 @@ export class Participar implements OnInit, OnDestroy {
   }
 
   async ngOnInit() {
-    // SPA: sempre browser, então pode usar localStorage sem PLATFORM_ID
     const token = localStorage.getItem('token');
     if (!token) {
-      this.showNotification('Você precisa estar logado para jogar!', 'warning');
+      this.showNotification('Voce precisa estar logado para jogar!', 'warning');
       this.router.navigate(['/auth']);
       return;
     }
 
-    // Stripe
     this.stripe = await loadStripe(environment.stripePublicKey);
     if (this.stripe) this.stripeElements = this.stripe.elements();
 
-    // Botão / montagem do card do Stripe (apenas 1 subscribe)
     this.formDadosEntrega
       .get('formaPagamento')
       ?.valueChanges
@@ -106,8 +103,8 @@ export class Participar implements OnInit, OnDestroy {
           return;
         }
 
-        if (value === 'Cartão de Crédito') {
-          this.textBtnPay = 'Pagar com Cartão';
+        if (value === 'Cartao de Credito') {
+          this.textBtnPay = 'Pagar com Cartao';
 
           setTimeout(() => {
             const cardDiv = document.getElementById('card-element');
@@ -123,81 +120,80 @@ export class Participar implements OnInit, OnDestroy {
         this.textBtnPay = 'Confirmar Pagamento';
       });
 
-    // Dados iniciais via API
-    this.http.get<{ premio: string; imagens?: { id: string; imagem: string }[] }>(
-      '/api/game/public-current-game'
-    ).subscribe({
-      next: (res) => {
-        this.product.name = res.premio;
-        this.product.imagens = res.imagens ?? [];
-      },
-      error: (err) => console.error('Erro ao buscar dados públicos do jogo:', err)
-    });
-
-    this.http.get<{ preco: number }>('/api/game/current-game').subscribe({
-      next: (res) => (this.preco = res.preco),
-      error: (err) => console.error('Erro ao buscar preço do jogo:', err)
-    });
-
-    this.http.get<{ rua: string; numero: string; bairro: string; cidade: string; estado: string; cep: string }>(
-      '/api/game/delivery-infos'
-    ).subscribe({
-      next: (res) => this.formDadosEntrega.patchValue(res),
-      error: (err) => console.error('Erro ao buscar dados de entrega:', err)
-    });
-
-    // SignalR (substitui Socket.IO)
     await this.signalR.connect();
 
-    this.signalR.premio$
+    this.signalR.prizeDescription$
       .pipe(takeUntil(this.destroy$))
-      .subscribe((data: any) => {
-        if (data?.descricao) this.product.name = data.descricao;
+      .subscribe(description => {
+        if (description) this.product.name = description;
       });
 
-    this.signalR.premioImagens$
+    this.signalR.prizeImages$
       .pipe(takeUntil(this.destroy$))
-      .subscribe((data: any) => {
-        if (Array.isArray(data?.imagens)) this.product.imagens = data.imagens;
+      .subscribe(images => {
+        this.product.imagens = images.map(img => ({
+          id: img.id,
+          imagem: img.image
+        }));
       });
 
-    this.signalR.preco$
+    this.signalR.price$
       .pipe(takeUntil(this.destroy$))
-      .subscribe((data: any) => {
-        if (data?.preco != null) this.preco = data.preco;
+      .subscribe(price => {
+        if (price) this.preco = price;
       });
 
-    this.signalR.pixPaidTrue$
-      .pipe(
-        takeUntil(this.destroy$),
-        filter((data: any) => !!data && data.userId === this.auth.getUserId())
-      )
-      .subscribe((data: any) => {
-        if (data?.paid) {
-          this.paid = true;
-          this.router.navigate(['/play']);
-        }
-      });
+    try {
+      const publicGame = await this.signalR.getPublicGame();
+      this.product.name = publicGame.prizeDescription;
+      this.product.imagens = publicGame.images.map(img => ({
+        id: img.id,
+        imagem: img.image
+      }));
+
+      const current = await this.signalR.getCurrentGame();
+      this.preco = current.price;
+    } catch (err) {
+      console.error('Erro ao buscar dados do jogo:', err);
+    }
+
+    try {
+      const delivery = await this.signalR.getDeliveryInfo();
+      if (delivery) {
+        this.formDadosEntrega.patchValue({
+          rua: delivery.street,
+          numero: delivery.number,
+          bairro: delivery.neighborhood,
+          cidade: delivery.city,
+          estado: delivery.state,
+          cep: delivery.zipCode
+        });
+      }
+    } catch (err) {
+      console.error('Erro ao buscar dados de entrega:', err);
+    }
   }
 
   validarCupom(code: string) {
     if (!code || code.trim().length === 0) return;
 
-    this.http.get(`/api/game/influencer/validar-cupom/${code}`).subscribe({
-      next: (res: any) => {
-        this.preco = res.precoComDesconto;
-        this.influencerId = res.influencer_id;
-        this.discount_percent = res.discount_percent;
-        this.comission = res.comission;
-        this.couponCode = code;
-      },
-      error: () => {
+    this.signalR.validateCoupon(code).then((res) => {
+      if (!res.isValid) {
         this.influencerId = null;
         this.discount_percent = 0;
         this.couponCode = '';
         this.comission = 0;
-        this.showNotification('Cupom inválido ou expirado.', 'error');
+        this.showNotification(res.message || 'Cupom invalido ou expirado.', 'error');
+        return;
       }
+
+      this.preco = res.priceWithDiscount;
+      this.influencerId = res.influencerId ?? null;
+      this.discount_percent = res.discountPercent;
+      this.comission = res.commissionAmount;
+      this.couponCode = code;
+    }).catch(() => {
+      this.showNotification('Erro ao validar cupom.', 'error');
     });
   }
 
@@ -225,14 +221,8 @@ export class Participar implements OnInit, OnDestroy {
     this.loadingPagamento = true;
 
     try {
-      const res = await firstValueFrom(
-        this.http.get<{ id: number; ativo: boolean; totalPlayers: number; playersPaidCount: number }>(
-          '/api/game/current-game',
-          { headers: this.getAuthHeaders() }
-        )
-      );
-
-      if (!res.ativo) {
+      const current = await this.signalR.getCurrentGame();
+      if (!current.isActive) {
         this.showNotification('Nenhum jogo ativo no momento. Tente novamente mais tarde.', 'warning');
         return;
       }
@@ -242,15 +232,13 @@ export class Participar implements OnInit, OnDestroy {
       if (formaPagamento === 'Pix') {
         const pixRes = await firstValueFrom(
           this.http.post<PixResponse>(
-            '/api/game/efi/gerar-pix',
+            '/api/payments/pix',
             {
-              valor: this.preco,
-              formaPagamento,
-              endereco: this.formDadosEntrega.value,
-              coupon_code: this.couponCode,
-              influencer_id: this.influencerId,
-              discount_percent: this.discount_percent,
-              comission: this.comission
+              amount: this.preco,
+              couponCode: this.couponCode,
+              influencerId: this.influencerId,
+              discountPercent: this.discount_percent,
+              commissionAmount: this.comission
             },
             { headers: this.getAuthHeaders() }
           )
@@ -262,10 +250,10 @@ export class Participar implements OnInit, OnDestroy {
         return;
       }
 
-      if (formaPagamento === 'Cartão de Crédito') {
+      if (formaPagamento === 'Cartao de Credito') {
         const response = await firstValueFrom(
           this.http.post<{ clientSecret: string }>(
-            '/api/game/create-payment-intent',
+            '/api/payments/create-payment-intent',
             { amount: Math.round(this.preco * 100) },
             { headers: this.getAuthHeaders() }
           )
@@ -295,14 +283,22 @@ export class Participar implements OnInit, OnDestroy {
         if (result.paymentIntent?.status === 'succeeded') {
           await firstValueFrom(
             this.http.post(
-              '/api/game/confirmar-pagamento-cartao',
+              '/api/payments/confirm-card',
               {
-                valor: this.preco,
-                endereco: this.formDadosEntrega.value,
-                coupon_code: this.couponCode,
-                influencer_id: this.influencerId,
-                discount_percent: this.discount_percent,
-                comission: this.comission
+                amount: this.preco,
+                delivery: {
+                  street: this.formDadosEntrega.value.rua,
+                  number: this.formDadosEntrega.value.numero,
+                  neighborhood: this.formDadosEntrega.value.bairro,
+                  city: this.formDadosEntrega.value.cidade,
+                  state: this.formDadosEntrega.value.estado,
+                  zipCode: this.formDadosEntrega.value.cep
+                },
+                couponCode: this.couponCode,
+                influencerId: this.influencerId,
+                discountPercent: this.discount_percent,
+                commissionAmount: this.comission,
+                providerPaymentId: result.paymentIntent?.id
               },
               { headers: this.getAuthHeaders() }
             )
@@ -332,8 +328,8 @@ export class Participar implements OnInit, OnDestroy {
         setTimeout(() => (this.copiado = false), 2000);
       })
       .catch((err) => {
-        console.error('Erro ao copiar código Pix:', err);
-        this.showNotification('Erro ao copiar o código Pix.', 'error');
+        console.error('Erro ao copiar codigo Pix:', err);
+        this.showNotification('Erro ao copiar o codigo Pix.', 'error');
       });
   }
 
@@ -348,7 +344,5 @@ export class Participar implements OnInit, OnDestroy {
   ngOnDestroy(): void {
     this.destroy$.next();
     this.destroy$.complete();
-    // opcional: se você quiser desconectar quando sair da tela
-    // this.signalR.disconnect();
   }
 }

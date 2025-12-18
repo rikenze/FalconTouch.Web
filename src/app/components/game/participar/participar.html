@@ -1,7 +1,7 @@
 <div class="participar-page">
   <div class="participacao-text">
-    <h2>🔐 Confirmação de Participação</h2>
-    <p class="sub">Você está prestes a garantir sua chance no <strong>FalconTouch</strong>.</p>
+    <h2>Confirmacao de Participacao</h2>
+    <p class="sub">Voce esta prestes a garantir sua chance no <strong>FalconTouch</strong>.</p>
   </div>
 
   <div class="product-container">
@@ -16,47 +16,47 @@
 
   <div class="preco-section" *ngIf="preco">
     <p><strong>Valor:</strong> <span class="price"> {{ preco | number: '1.2-2' }} R$</span></p>
-    <p class="info">Pagamento único. Nenhuma cobrança adicional será feita.</p>
+    <p class="info">Pagamento unico. Nenhuma cobranca adicional sera feita.</p>
   </div>
 
   <form [formGroup]="formDadosEntrega" (ngSubmit)="confirmarPagamento()" novalidate>
     <fieldset class="form-group">
-      <legend>Endereço para entrega</legend>
+      <legend>Endereco para entrega</legend>
 
       <label for="rua">Rua *</label>
       <input id="rua" type="text" formControlName="rua" placeholder="Rua" />
       <small class="error" *ngIf="formDadosEntrega.get('rua')?.invalid && formDadosEntrega.get('rua')?.touched">
-        Rua é obrigatória.
+        Rua obrigatoria.
       </small>
 
-      <label for="numero">Número *</label>
-      <input id="numero" type="text" formControlName="numero" placeholder="Número" />
+      <label for="numero">Numero *</label>
+      <input id="numero" type="text" formControlName="numero" placeholder="Numero" />
       <small class="error" *ngIf="formDadosEntrega.get('numero')?.invalid && formDadosEntrega.get('numero')?.touched">
-        Número é obrigatório.
+        Numero obrigatorio.
       </small>
 
       <label for="bairro">Bairro *</label>
       <input id="bairro" type="text" formControlName="bairro" placeholder="Bairro" />
       <small class="error" *ngIf="formDadosEntrega.get('bairro')?.invalid && formDadosEntrega.get('bairro')?.touched">
-        Bairro é obrigatório.
+        Bairro obrigatorio.
       </small>
 
       <label for="cidade">Cidade *</label>
       <input id="cidade" type="text" formControlName="cidade" placeholder="Cidade" />
       <small class="error" *ngIf="formDadosEntrega.get('cidade')?.invalid && formDadosEntrega.get('cidade')?.touched">
-        Cidade é obrigatória.
+        Cidade obrigatoria.
       </small>
 
       <label for="estado">Estado *</label>
       <input id="estado" type="text" formControlName="estado" placeholder="Estado" maxlength="2" />
       <small class="error" *ngIf="formDadosEntrega.get('estado')?.invalid && formDadosEntrega.get('estado')?.touched">
-        Estado é obrigatório e deve ter 2 caracteres.
+        Estado obrigatorio e deve ter 2 caracteres.
       </small>
 
       <label for="cep">CEP *</label>
       <input id="cep" type="text" formControlName="cep" placeholder="12345-678" />
       <small class="error" *ngIf="formDadosEntrega.get('cep')?.invalid && formDadosEntrega.get('cep')?.touched">
-        Informe um CEP válido.
+        Informe um CEP valido.
       </small>
     </fieldset>
 
@@ -66,10 +66,9 @@
       <label for="telefone">Telefone *</label>
       <input id="telefone" type="text" formControlName="telefone" placeholder="(99) 99999-9999" mask="(00) 00000-0000" />
       <small class="error" *ngIf="formDadosEntrega.get('telefone')?.invalid && formDadosEntrega.get('telefone')?.touched">
-        Informe um telefone válido.
+        Informe um telefone valido.
       </small>
     </fieldset>
-
 
     <fieldset class="form-group">
       <legend>Cupom</legend>
@@ -124,30 +123,28 @@
     <div *ngIf="pixQrCode && isPixSelected" class="pix-container" style="margin-top: 20px; text-align:center;">
       <h4>Pagamento via Pix</h4>
       <img [src]="pixQrCode" alt="QR Code Pix" style="max-width: 250px; border: 1px solid #ccc; padding: 10px;" />
-      <p><strong>Código Pix:</strong></p>
+      <p><strong>Codigo Pix:</strong></p>
       <div style="position: relative;">
         <textarea readonly rows="3" style="width: 100%; font-family: monospace;">{{ pixCode }}</textarea>
         <button type="button" class="copy-button" (click)="copiarPixCode()">
-          📋
+          Copiar
         </button>
       </div>
-      
-      <small *ngIf="copiado" class="copied-msg">Código Pix copiado!</small>
+
+      <small *ngIf="copiado" class="copied-msg">Codigo Pix copiado!</small>
     </div>
 
-    <fieldset *ngIf="formDadosEntrega.get('formaPagamento')?.value === 'Cartão de Crédito'">
-      <legend>Dados do Cartão</legend>
+    <fieldset *ngIf="formDadosEntrega.get('formaPagamento')?.value === 'Cartao de Credito'">
+      <legend>Dados do Cartao</legend>
       <div id="card-element" class="stripe-card-container"></div>
     </fieldset>
 
-    <!-- Botão de pagar -->
     <button class="btn btn-pay" type="submit">{{textBtnPay}}</button>
-
   </form>
 
-  <p class="security-note">🔒 Pagamento 100% seguro.</p>
+  <p class="security-note">Pagamento 100% seguro.</p>
 
-  <button class="btn btn-back" (click)="voltar()">← Voltar</button>
+  <button class="btn btn-back" (click)="voltar()">Voltar</button>
 
   <app-notification
     [show]="showNotificationDialog"

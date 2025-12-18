@@ -6,71 +6,71 @@
 </app-notification>
 
 <div *ngIf="auth.isAdmin$ | async" class="admin-panel">
-
   <h2>{{ editMode ? 'Editar' : 'Cadastrar' }} Influenciador</h2>
 
-    <form [formGroup]="influencerForm" (ngSubmit)="submitInfluencer()" class="form-block">
-        <label for="name">Nome:</label>
-        <input id="name" type="text" formControlName="name" required />
-        <small class="error" *ngIf="influencerForm.get('name')?.invalid && influencerForm.get('name')?.touched">
-            Nome é obrigatório.
-        </small>
+  <form [formGroup]="influencerForm" (ngSubmit)="submitInfluencer()" class="form-block">
+    <label for="name">Nome:</label>
+    <input id="name" type="text" formControlName="name" required />
+    <small class="error" *ngIf="influencerForm.get('name')?.invalid && influencerForm.get('name')?.touched">
+      Nome obrigatorio.
+    </small>
 
-        <label for="code">Código:</label>
-        <input id="code" type="text" formControlName="code" required />
-        <small class="error" *ngIf="influencerForm.get('code')?.invalid && influencerForm.get('code')?.touched">
-            Código é obrigatório.
-        </small>
+    <label for="code">Codigo:</label>
+    <input id="code" type="text" formControlName="code" required />
+    <small class="error" *ngIf="influencerForm.get('code')?.invalid && influencerForm.get('code')?.touched">
+      Codigo obrigatorio.
+    </small>
 
-        <label for="discount">Desconto (%):</label>
-        <input id="discount" type="number" formControlName="discount_percent" step="1" min="0" max="100" required />
-        <small class="error" *ngIf="influencerForm.get('discount_percent')?.invalid && influencerForm.get('discount_percent')?.touched">
-            Desconto é obrigatório.
-        </small>
+    <label for="discountPercent">Desconto (%):</label>
+    <input id="discountPercent" type="number" formControlName="discountPercent" step="1" min="0" max="100" required />
+    <small class="error" *ngIf="influencerForm.get('discountPercent')?.invalid && influencerForm.get('discountPercent')?.touched">
+      Desconto obrigatorio.
+    </small>
 
-        <label for="commission_type">Tipo de Comissão:</label>
-        <select id="commission_type" formControlName="commission_type" required>
-            <option value="per_player">R$ por jogador</option>
-            <option value="prize">Prêmio por meta</option>
-        </select>
-        <small class="error" *ngIf="influencerForm.get('commission_type')?.invalid && influencerForm.get('commission_type')?.touched">
-            Tipo de comissão é obrigatório.
-        </small>
+    <label for="commissionType">Tipo de Comissao:</label>
+    <select id="commissionType" formControlName="commissionType" required>
+      <option value="per_player">R$ por jogador</option>
+      <option value="prize">Premio por meta</option>
+    </select>
+    <small class="error" *ngIf="influencerForm.get('commissionType')?.invalid && influencerForm.get('commissionType')?.touched">
+      Tipo de comissao obrigatorio.
+    </small>
 
-        <label for="commission_value">Valor (R$):</label>
-        <input id="commission_value" type="number" formControlName="commission_value" step="0.01" min="0" [disabled]="isPrizeCommission" required />
-        <small class="error" *ngIf="influencerForm.get('commission_value')?.invalid && influencerForm.get('commission_value')?.touched">
-            Valor da comissão é obrigatório.
-        </small>
+    <label for="commissionValue">Valor (R$):</label>
+    <input id="commissionValue" type="number" formControlName="commissionValue" step="0.01" min="0" [disabled]="isPrizeCommission" required />
+    <small class="error" *ngIf="influencerForm.get('commissionValue')?.invalid && influencerForm.get('commissionValue')?.touched">
+      Valor da comissao obrigatorio.
+    </small>
 
-        <label for="follower_count">Seguidores:</label>
-        <input id="follower_count" type="number" formControlName="follower_count" min="0" required />
-        <small class="error" *ngIf="influencerForm.get('follower_count')?.invalid && influencerForm.get('follower_count')?.touched">
-            Número de seguidores é obrigatório.
-        </small>
+    <label for="followerCount">Seguidores:</label>
+    <input id="followerCount" type="number" formControlName="followerCount" min="0" required />
+    <small class="error" *ngIf="influencerForm.get('followerCount')?.invalid && influencerForm.get('followerCount')?.touched">
+      Numero de seguidores obrigatorio.
+    </small>
 
-        <label for="minimum_follower_percentage">Meta (%):</label>
-        <input id="minimum_follower_percentage" type="number" formControlName="minimum_follower_percentage" min="0" required />
-        <small class="error" *ngIf="influencerForm.get('minimum_follower_percentage')?.invalid && influencerForm.get('minimum_follower_percentage')?.touched">
-            Meta de seguidores é obrigatório.
-        </small>
+    <label for="minimumFollowerPercentage">Meta (%):</label>
+    <input id="minimumFollowerPercentage" type="number" formControlName="minimumFollowerPercentage" min="0" required />
+    <small class="error" *ngIf="influencerForm.get('minimumFollowerPercentage')?.invalid && influencerForm.get('minimumFollowerPercentage')?.touched">
+      Meta de seguidores obrigatoria.
+    </small>
 
-        <label for="active">Ativo:</label>
-        <input id="active" type="checkbox" formControlName="active" />
+    <label for="active">Ativo:</label>
+    <input id="active" type="checkbox" formControlName="active" />
 
-        <button type="submit" class="btn-primary">
-            {{ editMode ? 'Atualizar' : 'Cadastrar' }}
-        </button>
+    <button type="submit" class="btn-primary">
+      {{ editMode ? 'Atualizar' : 'Cadastrar' }}
+    </button>
 
-        <button
-            type="button"
-            class="btn-secondary"
-            (click)="resetForm()"
-            *ngIf="editMode"
-            style="margin-top: 0.5rem;">
-            Cancelar
-        </button>
-    </form>
+    <button
+      type="button"
+      class="btn-secondary"
+      (click)="resetForm()"
+      *ngIf="editMode"
+      style="margin-top: 0.5rem;">
+      Cancelar
+    </button>
+  </form>
+
   <hr />
 
   <h3>Influenciadores Cadastrados</h3>
@@ -78,52 +78,49 @@
     <thead>
       <tr>
         <th>Nome</th>
-        <th>Código</th>
+        <th>Codigo</th>
         <th>Desconto (%)</th>
-        <th>Comissão</th>
+        <th>Comissao</th>
         <th>Valor (R$)</th>
         <th>Seguidores</th>
         <th>Meta (%)</th>
         <th>Ativo</th>
-        <th>Conversões</th>
-        <th>Ações</th>
+        <th>Conversoes</th>
+        <th>Acoes</th>
       </tr>
     </thead>
     <tbody>
       <tr *ngFor="let influencer of influencers">
         <td>{{ influencer.name }}</td>
         <td>{{ influencer.code }}</td>
-        <td>{{ influencer.discount_percent }}</td>
-        <td>{{ influencer.commission_type === 'per_player' ? 'R$/jogador' : 'Prêmio' }}</td>
-        <td>{{ influencer.commission_value | number:'1.2-2' }}</td>
-        <td>{{ influencer.follower_count }}</td>
-        <td>{{ influencer.minimum_follower_percentage }}</td>
-        <td>{{ influencer.active ? 'Sim' : 'Não' }}</td>
+        <td>{{ influencer.discountPercent }}</td>
+        <td>{{ influencer.commissionType === 'per_player' ? 'R$/jogador' : 'Premio' }}</td>
+        <td>{{ influencer.commissionValue | number:'1.2-2' }}</td>
+        <td>{{ influencer.followerCount }}</td>
+        <td>{{ influencer.minimumFollowerPercentage }}</td>
+        <td>{{ influencer.active ? 'Sim' : 'Nao' }}</td>
         <td>
           <strong>
             {{ influencer.paidCount }} / {{ influencer.conversionGoal }}
           </strong>
           <br />
-          <small 
+          <small
             [style.color]="influencer.conversionStatus === 'Meta Atingida' ? 'green' : 'red'">
-            <span *ngIf="influencer.conversionStatus === 'Meta Atingida'">✅</span>
-            <span *ngIf="influencer.conversionStatus !== 'Meta Atingida'">⚠️</span>
             {{ influencer.conversionStatus || 'Sem meta definida' }}
           </small>
           <br />
-          <small>Total seguidores: {{ influencer.follower_count }}</small>
+          <small>Total seguidores: {{ influencer.followerCount }}</small>
         </td>
 
         <td>
           <button type="button" (click)="editInfluencer(influencer)" class="edit" style="background-color: var(--warning); color: black;">
-            ✏️
+            Editar
           </button>
           <button type="button" (click)="deleteInfluencer(influencer.id)" class="delete" style="background-color: var(--danger);">
-            🗑️
+            Excluir
           </button>
         </td>
       </tr>
     </tbody>
   </table>
-
 </div>

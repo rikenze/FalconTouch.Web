@@ -1,10 +1,10 @@
 import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
-import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { CommonModule } from '@angular/common';
 import { NotificationComponent } from '../game/notification.component/notification.component';
 import { AuthService } from '../game/auth.service';
 import { take } from 'rxjs/operators';
+import { SignalRService } from '../game/signalr.service';
 
 @Component({
   selector: 'app-influencer-panel',
@@ -19,17 +19,17 @@ export class InfluencerPanel implements OnInit {
     id: number;
     name: string;
     code: string;
-    discount_percent: number;
-    commission_type: string;
-    commission_value: number;
-    follower_count: number;
-    minimum_follower_percentage: number;
+    discountPercent: number;
+    commissionType: string;
+    commissionValue: number;
+    followerCount: number;
+    minimumFollowerPercentage: number;
     active: boolean;
     paidCount?: number;
     conversionDisplay?: string;
     conversionStatus?: string;
     conversionPercent?: number;
-    conversionGoal?: number; 
+    conversionGoal?: number;
   }[] = [];
 
   message = '';
@@ -45,30 +45,32 @@ export class InfluencerPanel implements OnInit {
   constructor(
     public auth: AuthService,
     private fb: FormBuilder,
-    private http: HttpClient
+    private signalR: SignalRService
   ) {
     this.influencerForm = this.fb.group({
       name: ['', Validators.required],
       code: ['', Validators.required],
-      discount_percent: ['', [Validators.required, Validators.min(0), Validators.max(100)]],
-      commission_type: ['per_player', Validators.required],
-      commission_value: [1, [Validators.required, Validators.min(0)]],
-      follower_count: [0, [Validators.required, Validators.min(0)]],
-      minimum_follower_percentage: [0, [Validators.required, Validators.min(0)]],
+      discountPercent: ['', [Validators.required, Validators.min(0), Validators.max(100)]],
+      commissionType: ['per_player', Validators.required],
+      commissionValue: [1, [Validators.required, Validators.min(0)]],
+      followerCount: [0, [Validators.required, Validators.min(0)]],
+      minimumFollowerPercentage: [0, [Validators.required, Validators.min(0)]],
       active: [true]
     });
   }
 
   ngOnInit(): void {
-    this.auth.isAdmin$.pipe(take(1)).subscribe((isAdmin: any) => {
+    this.auth.isAdmin$.pipe(take(1)).subscribe(async (isAdmin: any) => {
       if (!isAdmin) {
         this.message = 'Acesso negado. Apenas administradores.';
         this.messageType = 'error';
         return;
       }
 
-      this.influencerForm.get('commission_type')?.valueChanges.subscribe(type => {
-        const commissionControl = this.influencerForm.get('commission_value');
+      await this.signalR.connect();
+
+      this.influencerForm.get('commissionType')?.valueChanges.subscribe(type => {
+        const commissionControl = this.influencerForm.get('commissionValue');
         if (type === 'prize') {
           commissionControl?.disable();
         } else {
@@ -81,33 +83,27 @@ export class InfluencerPanel implements OnInit {
   }
 
   loadInfluencers() {
-    this.http.get('/api/game/influencer', { headers: this.getAuthHeaders() }).subscribe({
-      next: (data: any) => {
-        this.influencers = data;
-      },
-      error: () => this.showError('Erro ao carregar influenciadores.')
-    });
+    this.signalR.getInfluencers().then((data) => {
+      this.influencers = data;
+    }).catch(() => this.showError('Erro ao carregar influenciadores.'));
   }
 
   submitInfluencer() {
-  if (this.influencerForm.invalid) {
-    this.influencerForm.markAllAsTouched();
-    return;
-  }
+    if (this.influencerForm.invalid) {
+      this.influencerForm.markAllAsTouched();
+      return;
+    }
 
     const payload = this.influencerForm.value;
-    const headers = this.getAuthHeaders();
 
     if (this.editMode && this.editingId !== null) {
-      this.http.put(`/api/game/influencer/${this.editingId}`, payload, { headers }).subscribe({
-        next: () => this.afterSave('Influenciador atualizado com sucesso!'),
-        error: () => this.showError('Erro ao atualizar influenciador.')
-      });
+      this.signalR.updateInfluencer(this.editingId, payload).then(() => {
+        this.afterSave('Influenciador atualizado com sucesso!');
+      }).catch(() => this.showError('Erro ao atualizar influenciador.'));
     } else {
-      this.http.post('/api/game/influencer', payload, { headers }).subscribe({
-        next: () => this.afterSave('Influenciador cadastrado com sucesso!'),
-        error: () => this.showError('Erro ao cadastrar influenciador.')
-      });
+      this.signalR.createInfluencer(payload).then(() => {
+        this.afterSave('Influenciador cadastrado com sucesso!');
+      }).catch(() => this.showError('Erro ao cadastrar influenciador.'));
     }
   }
 
@@ -118,11 +114,11 @@ export class InfluencerPanel implements OnInit {
     this.influencerForm.patchValue({
       name: influencer.name,
       code: influencer.code,
-      discount_percent: influencer.discount_percent,
-      commission_type: influencer.commission_type,
-      commission_value: influencer.commission_value,
-      follower_count: influencer.follower_count,
-      minimum_follower_percentage: influencer.minimum_follower_percentage,
+      discountPercent: influencer.discountPercent,
+      commissionType: influencer.commissionType,
+      commissionValue: influencer.commissionValue,
+      followerCount: influencer.followerCount,
+      minimumFollowerPercentage: influencer.minimumFollowerPercentage,
       active: influencer.active
     });
   }
@@ -130,24 +126,21 @@ export class InfluencerPanel implements OnInit {
   deleteInfluencer(id: number) {
     if (!confirm('Tem certeza que deseja excluir este influenciador?')) return;
 
-    this.http.delete(`/api/game/influencer/${id}`, { headers: this.getAuthHeaders() }).subscribe({
-      next: () => {
-        this.loadInfluencers();
-        this.showNotification('Influenciador excluído com sucesso!', 'success');
-      },
-      error: () => this.showError('Erro ao excluir influenciador.')
-    });
+    this.signalR.deleteInfluencer(id).then(() => {
+      this.loadInfluencers();
+      this.showNotification('Influenciador excluido com sucesso!', 'success');
+    }).catch(() => this.showError('Erro ao excluir influenciador.'));
   }
 
   resetForm() {
     this.influencerForm.reset({
       name: '',
       code: '',
-      discount_percent: 0,
-      commission_type: 'per_player',
-      commission_value: 1,
-      follower_count: 0,
-      minimum_follower_percentage: 0,
+      discountPercent: 0,
+      commissionType: 'per_player',
+      commissionValue: 1,
+      followerCount: 0,
+      minimumFollowerPercentage: 0,
       active: true
     });
     this.editMode = false;
@@ -155,7 +148,7 @@ export class InfluencerPanel implements OnInit {
   }
 
   get isPrizeCommission(): boolean {
-    return this.influencerForm.get('commission_type')?.value === 'prize';
+    return this.influencerForm.get('commissionType')?.value === 'prize';
   }
 
   private afterSave(message: string) {
@@ -172,12 +165,5 @@ export class InfluencerPanel implements OnInit {
     this.notificationMessage = message;
     this.notificationType = type;
     this.showNotificationDialog = true;
-  }
-
-  private getAuthHeaders(): HttpHeaders {
-    const token = this.auth.getToken();
-    return new HttpHeaders({
-      Authorization: `Bearer ${token}`
-    });
   }
 }

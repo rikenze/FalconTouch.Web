@@ -52,7 +52,12 @@ export class AuthService {
       this.userCpfSubject.next(decoded.cpf || null);
       this.userIdSubject.next(decoded.id || null);
       this.loggedInSubject.next(true);
-      this.isAdminSubject.next(decoded.role === 'admin');
+      const role = String(
+        decoded.role ||
+        decoded['http://schemas.microsoft.com/ws/2008/06/identity/claims/role'] ||
+        ''
+      ).toLowerCase();
+      this.isAdminSubject.next(role === 'admin');
     } catch (err) {
       console.error('Erro ao decodificar token:', err);
       this.logout();
@@ -95,7 +100,11 @@ export class AuthService {
     if (!token) return null;
     try {
       const decoded: any = jwtDecode(token);
-      return decoded.role || null;
+      return (
+        decoded.role ||
+        decoded['http://schemas.microsoft.com/ws/2008/06/identity/claims/role'] ||
+        null
+      );
     } catch {
       return null;
     }
@@ -123,11 +132,11 @@ export class AuthService {
   }
 
   forgotPassword(email: string) {
-    return this.http.post<{ message: string }>(`${this.apiUrl}/forgot-password`, { email });
+    return this.http.post<{ message: string; token?: string }>(`${this.apiUrl}/auth/forgot-password`, { email });
   }
 
   resetPassword(token: string, newPassword: string) {
-    return this.http.post(`${this.apiUrl}/reset-password`, { token, newPassword });
+    return this.http.post(`${this.apiUrl}/auth/reset-password`, { token, newPassword });
   }
 
 

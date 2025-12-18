@@ -1,4 +1,3 @@
-
 <app-admin-panel></app-admin-panel>
 
 <app-notification
@@ -16,60 +15,43 @@
 <div class="wrapper">
   <header>
     <h1>FalconTouch!</h1>
-    <p class="subtitle">Seja o primeiro a tocar e ganhe o prêmio!</p>
+    <p class="subtitle">Seja o primeiro a tocar e ganhe o premio!</p>
 
-    <!-- Alerta de status do jogo -->
-    <div *ngIf="!gameReleased" class="alert alert-danger">
-      🚫 O jogo ainda não começou. Aguarde...
+    <div *ngIf="!gameStarted" class="alert alert-danger">
+      O jogo ainda nao comecou. Aguarde...
     </div>
-    <div *ngIf="gameReleased" class="alert alert-success">
-      ✅ O jogo começou! Prepare-se para tocar!
-    </div>
-
-    <!-- Barra de progresso de jogadores -->
-    <div *ngIf="isAdmin" class="player-progress-bar">
-      <div class="progress-fill" [style.width.%]="(playersPaidCount / (minPlayers || 1)) * 100"></div>
+    <div *ngIf="gameStarted" class="alert alert-success">
+      O jogo comecou! Prepare-se para tocar!
     </div>
   </header>
 
   <main class="main-layout">
     <section class="game-container">
-              <!-- TIMER DECRESCENTE -->
-  <div class="countdown-modal" *ngIf="countdownModalVisible">
-    <div class="countdown-number">
-      {{ countdown }}
-    </div>
-  </div>
-
-    <p class="prompt">Quando o botão "PREMIO!" aparecer, toque o mais rápido que puder!</p>
-      <div *ngIf="started" class="active-game buttons-grid">
+      <p class="prompt">Assim que o jogo iniciar, toque o mais rapido que puder!</p>
+      <div *ngIf="gameStarted" class="active-game buttons-grid">
         <button
           *ngFor="let btn of buttons; let i = index"
           class="btn btn-click"
-          [disabled]="i !== winningButtonIndex"
-          (click)="i === winningButtonIndex ? clickButton(winningButtonIndex) : null">
-          {{ i === winningButtonIndex ? 'PREMIO!' : 'PREMO!' }}
+          (click)="clickButton(i)">
+          TOCAR!
         </button>
       </div>
 
       <div *ngIf="isWinner" class="winner-announcement">
-        <h2>🎉 Parabéns, <span class="winner-name">{{ winner }}</span>! 🎉</h2>
-        <p>Você foi o primeiro a tocar e ganhou o prêmio! Entraremos em contato com você o mais breve possível!</p>
-        <!-- <button class="btn btn-reset" (click)="resetGame()">Jogar Novamente</button> -->
+        <h2>Parabens, <span class="winner-name">{{ winner }}</span>!</h2>
+        <p>Voce foi o primeiro a tocar e ganhou o premio! Entraremos em contato com voce o mais breve possivel!</p>
       </div>
 
       <div *ngIf="!isWinner && winner" class="loser-announcement">
-        <h2>😔 Infelizmente você não foi o jogador mais rápido.</h2>
-        <p>Mas continue tentando! A próxima rodada pode ser sua!</p>
+        <h2>Infelizmente voce nao foi o jogador mais rapido.</h2>
+        <p>Mas continue tentando! A proxima rodada pode ser sua!</p>
       </div>
 
-      <!-- Botão para ver ranking -->
       <button
         *ngIf="winner"
         class="open-ranking-button" (click)="this.rankingVisible = true">
-        📈 Ver Ranking
+        Ver Ranking
       </button>
     </section>
   </main>
-
 </div>

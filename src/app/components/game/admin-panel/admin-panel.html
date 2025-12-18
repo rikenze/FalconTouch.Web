@@ -1,79 +1,69 @@
-  <app-notification
-    [show]="showNotificationDialog"
-    [message]="notificationMessage"
-    [type]="notificationType"
-    (dismiss)="showNotificationDialog = false">
-  </app-notification>
+<app-notification
+  [show]="showNotificationDialog"
+  [message]="notificationMessage"
+  [type]="notificationType"
+  (dismiss)="showNotificationDialog = false">
+</app-notification>
+
 <div *ngIf="auth.isAdmin$ | async" class="admin-panel">
-  <h2>Painel de Administração</h2>
+  <h2>Painel de Administracao</h2>
 
   <div *ngIf="currentGameId" class="game-info">
-    <p><strong>ID do jogo atual:</strong> {{ currentGameId }}
-      <button (click)="resetGame()" style="background: transparent; color: grey;" class="reset-btn">Resetar configs</button>
-    </p>
+    <p><strong>ID do jogo atual:</strong> {{ currentGameId }}</p>
     <p><strong>Pagamentos confirmados:</strong> {{ playersPaidCount }}</p>
-    <p><strong>Jogadores conectados:</strong> {{ totalPlayers }}</p>
-    <p><strong>Status do jogo:</strong></p>
-    <div class="form-block center-button">
-      <button (click)="toggleAtivo()" class="toggle-btn" [ngClass]="jogoAtivo ? 'ativo' : 'inativo'">
-        {{ jogoAtivo ? 'Ativo' : 'Inativo' }}
-      </button>
-    </div>
   </div>
 
-  <!-- Formulário único para todas as configurações -->
-  <form [formGroup]="form" (ngSubmit)="updateConfigs()" class="form-block">
-    <label for="minPlayers">Número mínimo de jogadores:</label>
+  <form [formGroup]="configForm" (ngSubmit)="updateConfigs()" class="form-block">
+    <label for="minPlayers">Numero minimo de jogadores:</label>
     <input id="minPlayers" type="number" formControlName="minPlayers" />
-    <div *ngIf="form.controls['minPlayers'].invalid && form.controls['minPlayers'].touched" class="error">
-      Valor inválido. Mínimo 1.
+    <div *ngIf="configForm.controls['minPlayers'].invalid && configForm.controls['minPlayers'].touched" class="error">
+      Valor invalido. Minimo 1.
     </div>
 
-    <label for="preco">Preço (R$):</label>
-    <input id="preco" type="number" step="0.01" formControlName="preco" />
-    <div *ngIf="form.controls['preco'].invalid && form.controls['preco'].touched" class="error">
-      Preço inválido. Mínimo R$ 0,01.
+    <label for="price">Preco (R$):</label>
+    <input id="price" type="number" step="0.01" formControlName="price" />
+    <div *ngIf="configForm.controls['price'].invalid && configForm.controls['price'].touched" class="error">
+      Preco invalido. Minimo R$ 0,01.
     </div>
 
-    <label for="premio">Prêmio:</label>
-    <input id="premio" type="text" formControlName="premio" />
-    <div *ngIf="form.controls['premio'].invalid && form.controls['premio'].touched" class="error">
-      Informe o prêmio.
+    <label for="prizeDescription">Premio:</label>
+    <input id="prizeDescription" type="text" formControlName="prizeDescription" />
+    <div *ngIf="configForm.controls['prizeDescription'].invalid && configForm.controls['prizeDescription'].touched" class="error">
+      Informe o premio.
     </div>
 
-    <!-- Upload de nova imagem -->
     <div class="form-block upload-container">
-      <label for="uploadImagem">Adicionar nova imagem ao prêmio:</label>
+      <label for="uploadImagem">Adicionar nova imagem ao premio:</label>
       <input id="uploadImagem" type="file" (change)="upload($event)" accept="image/*" />
     </div>
 
     <button
       type="submit"
-      [disabled]="form.invalid"
+      [disabled]="configForm.invalid"
       style="background-color: #007bff; color: white; margin-top: 1rem;">
-      Atualizar Configurações
+      Atualizar Configuracoes
     </button>
   </form>
 
-  <!-- Liberar jogo -->
-  <form [formGroup]="form" (ngSubmit)="releaseGame()" class="form-block">
-    <label for="countdown">Tempo de contagem (segundos):</label>
-    <input id="countdown" type="number" formControlName="countdown" />
-    <div *ngIf="form.controls['countdown'].invalid && form.controls['countdown'].touched" class="error">
-      Valor inválido. Mínimo 1 segundo.
+  <div class="form-block center-button">
+    <button (click)="toggleActive()" class="toggle-btn" [ngClass]="gameActive ? 'ativo' : 'inativo'">
+      {{ gameActive ? 'Ativo' : 'Inativo' }}
+    </button>
+  </div>
+
+  <form [formGroup]="startForm" (ngSubmit)="startGame()" class="form-block">
+    <label for="numberOfButtons">Numero de botoes:</label>
+    <input id="numberOfButtons" type="number" formControlName="numberOfButtons" />
+    <div *ngIf="startForm.controls['numberOfButtons'].invalid && startForm.controls['numberOfButtons'].touched" class="error">
+      Valor invalido. Minimo 2.
     </div>
     <button
       type="submit"
-      [disabled]="form.controls['countdown'].invalid"
+      [disabled]="startForm.invalid"
       style="color: #fff;">
-      Liberar Jogo <i class="fa-solid fa-flag fa-beat" style="color: #FFD43B;"></i>
+      Iniciar jogo
     </button>
   </form>
-    <button
-     (click)="sendMessageToPlayers()"
-      type="submit" style="color: #fff;">
-      Avisar jogadores <i class="fa-solid fa-paper-plane" style="color: #FFD43B;"></i>
-    </button>
 
   <p *ngIf="message" [ngClass]="messageType">{{ message }}</p>
 </div>

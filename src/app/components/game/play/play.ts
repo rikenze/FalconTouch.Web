@@ -29,26 +29,18 @@ export class Play implements OnInit, OnDestroy {
   notificationMessage = '';
   notificationType: 'success' | 'error' | 'warning' = 'success';
 
-  countdown: number = 0;
-  gameReleased = false;
-  started = false;
+  gameStarted = false;
   winner: string | null = null;
   isWinner: boolean = false;
-  winnerId: string | null = null;
-  buttonIndex: string | null = null;
-  playersPaidCount = 0;
-  minPlayers = 0;
-  buttons = new Array(8);
-  winningButtonIndex: number = -1;
-  countdownModalVisible = false;
+  winnerId: number | null = null;
+  buttons: number[] = [];
   isAdmin = false;
 
   private isBrowser: boolean;
   private subscriptions: Subscription[] = [];
-  private countdownInterval: ReturnType<typeof setInterval> | null = null;
 
   rankingVisible = false;
-  rankingList: { email: string, time: number }[] = [];
+  rankingList: { userId: number; email: string; time: number }[] = [];
 
   constructor(
     private router: Router,
@@ -79,7 +71,7 @@ export class Play implements OnInit, OnDestroy {
 
     this.isAdmin = this.auth.isAdmin();
     
-    this.http.get<{ hasPaid: boolean }>('/api/game/check-payment').subscribe({
+    this.http.get<{ hasPaid: boolean }>('/api/payments/check-payment').subscribe({
       next: (res) => {
         if (!res.hasPaid) {
           this.showNotification('Você precisa realizar o pagamento para participar do jogo.', 'warning');
@@ -89,6 +81,17 @@ export class Play implements OnInit, OnDestroy {
 
         this.signalRService.connect();
         this.subscribeSocketEvents();
+
+        this.signalRService.getCurrentGame()
+          .then((current) => {
+            if (current.isActive) {
+              this.gameStarted = true;
+              this.buttons = Array.from({ length: current.numberOfButtons }, (_, i) => i);
+            }
+          })
+          .catch((err) => {
+            console.warn('Erro ao buscar estado do jogo:', err);
+          });
       },
       error: () => {
         this.showNotification('Erro ao verificar pagamento. Tente novamente.', 'error');
@@ -99,101 +102,51 @@ export class Play implements OnInit, OnDestroy {
 
   private subscribeSocketEvents(): void {
     this.subscriptions.push(
-
-      this.signalRService.playersPaidCount$.subscribe(({ current, min }) => {
-        this.playersPaidCount = current;
-        this.minPlayers = min;
+      this.signalRService.gameStarted$.subscribe((data) => {
+        this.gameStarted = true;
+        this.winner = null;
+        this.isWinner = false;
+        this.winnerId = null;
+        this.buttons = Array.from({ length: data.buttons }, (_, i) => i);
       }),
 
-      this.signalRService.countdown$.subscribe((value) => {
-        this.countdown = value;
-        if (value > 0 && !this.countdownInterval) {
-          this.countdownModalVisible = true;
-          this.startCountdown();
-        }
-        if (value === 0) {
-          this.countdownModalVisible = false;
-          this.clearCountdownInterval();
-        }
+      this.signalRService.rankingUpdated$.subscribe((ranking) => {
+        this.rankingList = ranking.map(item => ({
+          userId: item.userId,
+          email: item.email ?? 'Jogador',
+          time: item.reactionTimeMs
+        }));
       }),
 
-      this.signalRService.gameReleased$.subscribe((released) => {
-        this.gameReleased = released;
+      this.signalRService.winnerConfirmed$.subscribe((data) => {
+        this.winnerId = data.winnerId;
+        const winnerEntry = this.rankingList.find(item => item.userId === data.winnerId);
+        this.winner = winnerEntry?.email ?? `ID ${data.winnerId}`;
+        this.isWinner = String(this.auth.getUserId()) === String(data.winnerId);
+        this.gameStarted = false;
       }),
 
-      this.signalRService.releaseButtons$.subscribe((index) => {
-        this.winningButtonIndex = index;
+      this.signalRService.clickRejected$.subscribe((message) => {
+        this.showNotification(message, 'warning');
       }),
 
-      this.signalRService.winner$.subscribe((data) => {
-        if (data) {
-          this.winner = data.playerEmail;
-          this.buttonIndex = data.buttonIndex;
-          this.winnerId = data.winnerId;
-          this.isWinner = (this.playerEmail === this.winner);
-          this.started = false;
-          this.clearCountdownInterval();
-        }
-      }),
-
-      this.signalRService.ranking$.subscribe(ranking => {
-        this.rankingList = ranking;
-      }),
-
-      this.signalRService.reset$.subscribe(() => {
-        this.resetGame();
-        this.rankingVisible = false;
+      this.signalRService.gameStartError$.subscribe((message) => {
+        this.showNotification(message, 'error');
       })
     );
   }
 
-  private startCountdown(): void {
-    this.clearCountdownInterval();
-
-    this.countdownInterval = setInterval(() => {
-      this.countdown--;
-
-      if (this.countdown <= 0) {
-        this.countdownModalVisible = false;
-        this.countdown = 0;
-        this.clearCountdownInterval();
-        this.finishCountdown();
-      }
-    }, 1000);
-  }
-
-  private clearCountdownInterval(): void {
-    if (this.countdownInterval) {
-      clearInterval(this.countdownInterval);
-      this.countdownInterval = null;
-    }
-  }
-
-  private finishCountdown(): void {
-    if (!this.winnerId) {
-      this.started = true;
-      if (this.winningButtonIndex === -1) {
-        this.winningButtonIndex = Math.floor(Math.random() * 8);
-      }
-    }
-  }
-
   clickButton(index: number): void {
-    if (this.started && !this.winnerId && this.isBrowser) {
+    if (this.gameStarted && !this.winnerId && this.isBrowser) {
       this.signalRService.emitClick(index);
     }
   }
 
   resetGame(): void {
-    this.gameReleased = false;
-    this.started = false;
+    this.gameStarted = false;
     this.winnerId = null;
     this.winner = null;
-    this.buttonIndex = null;
-    this.winningButtonIndex = -1;
-    this.countdown = 0;
-    this.countdownModalVisible = false;
-    this.clearCountdownInterval();
+    this.buttons = [];
   }
 
   showNotification(msg: string, type: 'success' | 'error' | 'warning' = 'success') {
@@ -204,11 +157,9 @@ export class Play implements OnInit, OnDestroy {
 
   ngOnDestroy(): void {
     this.subscriptions.forEach(sub => sub.unsubscribe());
-    this.clearCountdownInterval();
     if (this.isBrowser) {
       this.signalRService.disconnect();
     }
     this.rankingVisible = false;
-    this.countdownModalVisible = false;
   }
 }
