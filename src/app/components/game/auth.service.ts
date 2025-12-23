@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Router } from '@angular/router';
 import { jwtDecode } from 'jwt-decode';
-import { BehaviorSubject, Observable } from 'rxjs';
+import { BehaviorSubject, Observable, map } from 'rxjs';
 
 @Injectable({
   providedIn: 'root'
@@ -65,11 +65,21 @@ export class AuthService {
   }
 
   loginRequest(email: string, password: string): Observable<{ token: string }> {
-    return this.http.post<{ token: string }>(`${this.apiUrl}/auth/login`, { email, password });
+    return this.http.post<any>(`${this.apiUrl}/auth/login`, { email, password }).pipe(
+      map((res) => {
+        const token = res?.token ?? res?.value?.token ?? res?.result?.token ?? res?.result?.value?.token;
+        return { token };
+      })
+    );
   }
 
   registerRequest(name: string, email: string, cpf: string, password: string): Observable<{ token: string }> {
-    return this.http.post<{ token: string }>(`${this.apiUrl}/auth/register`, { name, email, cpf, password });
+    return this.http.post<any>(`${this.apiUrl}/auth/register`, { name, email, cpf, password }).pipe(
+      map((res) => {
+        const token = res?.token ?? res?.value?.token ?? res?.result?.token ?? res?.result?.value?.token;
+        return { token };
+      })
+    );
   }
 
   login(token: string) {
