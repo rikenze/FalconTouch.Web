@@ -12,8 +12,10 @@ COPY . .
 # Build da aplicação Angular para produção
 RUN npm run build -- --configuration production
 
-# Corrige o nome do arquivo gerado pelo Angular SSR
-RUN mv dist/falcontouch/browser/index.csr.html dist/falcontouch/browser/index.html
+# Corrige o nome do arquivo gerado pelo Angular SSR (se existir)
+RUN if [ -f dist/falcontouch/browser/index.csr.html ]; then \
+      mv dist/falcontouch/browser/index.csr.html dist/falcontouch/browser/index.html; \
+    fi
 
 # Servir os arquivos estáticos via nginx
 FROM nginx:stable-alpine
