@@ -10,6 +10,7 @@ import { Subscription } from 'rxjs';
 import { NotificationComponent } from '../notification.component/notification.component';
 import { Ranking } from '../ranking/ranking';
 import { AuthService } from '../auth.service';
+import { trackEvent } from '../../../app-insights';
 
 interface TokenPayload {
   email?: string;
@@ -138,6 +139,7 @@ export class Play implements OnInit, OnDestroy {
 
   clickButton(index: number): void {
     if (this.gameStarted && !this.winnerId && this.isBrowser) {
+      trackEvent('click_button', { index });
       this.signalRService.emitClick(index);
     }
   }

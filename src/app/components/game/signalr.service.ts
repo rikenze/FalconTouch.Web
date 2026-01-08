@@ -19,6 +19,13 @@ export interface WinnerConfirmedPayload {
   winnerId: number;
 }
 
+export interface ClickRegisteredPayload {
+  gameId: number;
+  userId: number;
+  buttonIndex: number;
+  reactionTimeMs: number;
+}
+
 export interface PrizeImageDto {
   id: number;
   image: string;
@@ -104,6 +111,7 @@ export class SignalRService {
   public clickRejected$ = new Subject<string>();
   public gameStartError$ = new Subject<string>();
   public playerConnected$ = new Subject<string>();
+  public clickRegistered$ = new Subject<ClickRegisteredPayload>();
   public prizeDescription$ = new BehaviorSubject<string>('');
   public prizeImages$ = new BehaviorSubject<PrizeImageDto[]>([]);
   public price$ = new BehaviorSubject<number>(0);
@@ -159,6 +167,10 @@ export class SignalRService {
 
     this.hub.on('ClickRejected', (message: string) =>
       this.ngZone.run(() => this.clickRejected$.next(message))
+    );
+
+    this.hub.on('ClickRegistered', (data: ClickRegisteredPayload) =>
+      this.ngZone.run(() => this.clickRegistered$.next(data))
     );
 
     this.hub.on('RankingUpdated', (data: RankingItem[]) =>

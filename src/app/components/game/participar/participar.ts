@@ -11,6 +11,7 @@ import { environment } from '../../../../environments/environment';
 import { NotificationComponent } from '../notification.component/notification.component';
 import { AuthService } from '../auth.service';
 import { SignalRService } from '../signalr.service';
+import { trackEvent } from '../../../app-insights';
 
 interface PixResponse {
   imagemQrcode: string;
@@ -179,6 +180,7 @@ export class Participar implements OnInit, OnDestroy {
 
     this.signalR.validateCoupon(code).then((res) => {
       if (!res.isValid) {
+        trackEvent('coupon_invalid', { code });
         this.influencerId = null;
         this.discount_percent = 0;
         this.couponCode = '';
@@ -187,6 +189,7 @@ export class Participar implements OnInit, OnDestroy {
         return;
       }
 
+      trackEvent('coupon_validated', { code, discountPercent: res.discountPercent });
       this.preco = res.priceWithDiscount;
       this.influencerId = res.influencerId ?? null;
       this.discount_percent = res.discountPercent;
@@ -230,6 +233,7 @@ export class Participar implements OnInit, OnDestroy {
       const formaPagamento = this.formDadosEntrega.value.formaPagamento;
 
       if (formaPagamento === 'Pix') {
+        trackEvent('payment_pix_attempt', { amount: this.preco });
         const pixRes = await firstValueFrom(
           this.http.post<PixResponse>(
             '/api/payments/pix',
@@ -247,10 +251,12 @@ export class Participar implements OnInit, OnDestroy {
         this.pixQrCode = pixRes.imagemQrcode;
         this.pixCode = pixRes.qrcode;
         this.txid = pixRes.txid;
+        trackEvent('payment_pix_created', { txid: this.txid });
         return;
       }
 
       if (formaPagamento === 'Cartao de Credito') {
+        trackEvent('payment_card_attempt', { amount: this.preco });
         const response = await firstValueFrom(
           this.http.post<{ clientSecret: string }>(
             '/api/payments/create-payment-intent',
@@ -305,12 +311,14 @@ export class Participar implements OnInit, OnDestroy {
           );
 
           this.showNotification('Pagamento realizado com sucesso!', 'success');
+          trackEvent('payment_card_confirmed', { paymentIntentId: result.paymentIntent?.id });
           this.paid = true;
           this.router.navigate(['/play']);
         }
       }
     } catch (err: any) {
       console.error('Erro ao processar pagamento:', err);
+      trackEvent('payment_failed', { message: err?.error?.mensagem || err?.message });
       const msg = err?.error?.mensagem || err?.message || 'Erro ao processar pagamento. Tente novamente.';
       this.showNotification(msg, 'error');
     } finally {

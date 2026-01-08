@@ -7,6 +7,7 @@ import { NotificationComponent } from '../game/notification.component/notificati
 import { SignalRService } from '../game/signalr.service';
 import { NgxMaskDirective } from 'ngx-mask';
 import { ConfirmDialog } from '../game/confirm-dialog/confirm-dialog';
+import { trackEvent } from '../app-insights';
 
 @Component({
   selector: 'app-auth',
@@ -90,9 +91,11 @@ export class AuthComponent {
         localStorage.setItem('token', res.token);
         this.auth.login(res.token);
         this.signalRService.updateAuthToken(res.token);
+        trackEvent(this.isLogin ? 'login_success' : 'register_success');
         this.router.navigate(['/award']);
       },
       error: (err) => {
+        trackEvent(this.isLogin ? 'login_failed' : 'register_failed', { message: err?.error?.message });
         this.showNotification(err.error?.message || 'Erro ao autenticar', 'error');
       }
     });

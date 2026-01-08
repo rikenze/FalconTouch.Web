@@ -9,6 +9,7 @@ import { AuthService } from '../auth.service';
 import { NotificationComponent } from '../notification.component/notification.component';
 import { ConfirmDialog } from '../confirm-dialog/confirm-dialog';
 import { SignalRService } from '../signalr.service';
+import { trackEvent } from '../../../app-insights';
 
 @Component({
   selector: 'app-award',
@@ -136,14 +137,17 @@ export class Award implements OnInit, OnDestroy {
       return;
     }
 
+    trackEvent('start_game_attempt');
     this.http.get<{ hasPaid: boolean }>('/api/payments/check-payment').subscribe({
       next: (res) => {
         if (!res.hasPaid) {
+          trackEvent('start_game_blocked', { reason: 'not_paid' });
           this.showNotification('Voce precisa realizar o pagamento para participar.', 'warning');
           this.router.navigate(['/participar']);
           return;
         }
 
+        trackEvent('start_game_allowed');
         this.router.navigate(['/play']);
       },
       error: () => this.showNotification('Erro ao verificar pagamento.', 'error')
