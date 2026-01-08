@@ -7,7 +7,7 @@ import { NotificationComponent } from '../game/notification.component/notificati
 import { SignalRService } from '../game/signalr.service';
 import { NgxMaskDirective } from 'ngx-mask';
 import { ConfirmDialog } from '../game/confirm-dialog/confirm-dialog';
-import { trackEvent } from '../app-insights';
+import { trackEvent } from '../../app-insights';
 
 @Component({
   selector: 'app-auth',
